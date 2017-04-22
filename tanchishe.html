@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>贪吃蛇</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			p {
+				width: 10px;
+				height: 10px;
+				position: absolute;
+				background: #f00;
+				border-radius: 5px;
+			}
+			
+			#fir_p {
+				background: #000;
+			}
+			
+			div {
+				width: 500px;
+				height: 500px;
+				position: absolute;
+				left: 400px;
+				top: 100px;
+				border: 1px solid #000;
+			}
+			
+			span {
+				position: absolute;
+				left: 400px;
+				top: 630px;
+			}
+		</style>
+		<script>
+			onload = function() {
+				var oP = document.getElementsByClassName("p_cla");
+				var oFirp = document.getElementById("fir_p");
+				var oDiv = document.getElementById("box");
+				//水平垂直速度
+				var speedX = 10;
+				var speedY = 10;
+				var timer;
+				var str = "right";
+				var arr = [];
+				//事物的坐标
+				var foodX = 1;
+				var foodY = 2;
+				//头部的位置实时更新
+				var disX = 3;
+				var disY = 4;
+				//新食物
+				var new_p;
+				for(var i = 0; i < 5; i++) {
+					oP[i].style.left = 200 - 11 * i + "px";
+					oP[i].style.top = "300px";
+					arr.push(oP[i]);
+				}
+				position_key(document);
+				//运动函数
+				create_food();
+
+				function startMove(position) {
+					clearInterval(timer);
+					timer = setInterval(function() {
+						eat_food();
+
+						var fir_positionX = oFirp.offsetLeft;
+						var fir_positionY = oFirp.offsetTop;
+						//判断方向
+						if(position == "up") {
+							oFirp.style.left = oFirp.offsetLeft + "px";
+							oFirp.style.top = oFirp.offsetTop - speedY + "px";
+						}
+						if(position == "down") {
+							oFirp.style.left = oFirp.offsetLeft + "px";
+							oFirp.style.top = oFirp.offsetTop + speedY + "px";
+						}
+						if(position == "left") {
+							oFirp.style.left = oFirp.offsetLeft - speedX + "px";
+							oFirp.style.top = oFirp.offsetTop + "px";
+						}
+						if(position == "right") {
+							oFirp.style.left = oFirp.offsetLeft + speedX + "px";
+							oFirp.style.top = oFirp.offsetTop + "px";
+						}
+						for(var i = arr.length - 1; i > 0; i--) {
+							if(i == 1) {
+								arr[1].style.left = fir_positionX + "px";
+								arr[1].style.top = fir_positionY + "px";
+							} else {
+								arr[i].style.left = arr[i - 1].style.left;
+								arr[i].style.top = arr[i - 1].style.top;
+							}
+						}
+						disX = parseInt(oFirp.offsetLeft);
+						disY = parseInt(oFirp.offsetTop);
+						to_death();
+					}, 100);
+
+				}
+				//方向判断
+				function position_key(element) {
+					element.onkeydown = function(e) {
+						e = e || event;
+						switch(e.keyCode) {
+							//空格 暂停
+							case 32:
+								clearInterval(timer);
+								break;
+								//up
+							case 38:
+								if(str !== "down" && str !== "up") {
+									startMove("up");
+									str = "up";
+								}
+								break;
+								//down
+							case 40:
+								if(str !== "up" && str !== "down") {
+									startMove("down");
+									str = "down";
+								}
+								break;
+								//left
+							case 37:
+								if(str !== "right" && str !== "left") {
+									startMove("left");
+									str = "left";
+								}
+								break;
+								//rifht
+							case 39:
+								if(str !== "left" && str !== "right") {
+									startMove("right");
+									str = "right";
+								}
+								break;
+						}
+					}
+				}
+				//墙体判断
+				function to_death() {
+					if(disX < 0 || disX > 490 || disY < 0 || disY > 490) {
+						alert("lose");
+						clearInterval(timer);
+						history.go(0); //刷新页面
+					}
+				}
+
+				//随机产生p标签
+				function create_food() {
+					foodX = parseInt(Math.random() * 45 + 2) * 10;
+					foodY = parseInt(Math.random() * 45 + 2) * 10;
+
+					new_p = document.createElement("p");
+					new_p.style.left = foodX + "px";
+					new_p.style.top = foodY + "px";
+					oDiv.appendChild(new_p);
+				}
+				//吃掉果实后，加长
+				function eat_food() {
+					console.log(disY, disX, foodY, foodX)
+					if(disX == foodX && disY == foodY) {
+						arr.push(new_p);
+						create_food();
+					}
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+		<div id="box">
+			<p id="fir_p" class="p_cla"></p>
+			<p class="p_cla"></p>
+			<p class="p_cla"></p>
+			<p class="p_cla"></p>
+			<p class="p_cla"></p>
+		</div>
+		<span>方向键控制，空格暂停</span>
+	</body>
+
+</html>
